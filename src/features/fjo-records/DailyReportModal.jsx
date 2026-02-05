@@ -11,7 +11,9 @@ import {
   RefreshCw,
   Plane,
   AlertCircle,
+  FileDown,
 } from "lucide-react";
+import { generateFJO } from "../../utils/pdfGenerator"; // <--- Importamos el generador
 
 // AHORA RECIBIMOS LA PROP "onSaved"
 const DailyReportModal = ({ mission, onClose, onSaved }) => {
@@ -124,7 +126,14 @@ const DailyReportModal = ({ mission, onClose, onSaved }) => {
       is_weekend: false,
     });
   };
-
+  const handleDownloadPDF = async () => {
+    // Necesitamos el nombre del usuario para el PDF
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    // Opcional: Podrías buscar el nombre real en 'profiles', aquí usaremos el email por rapidez
+    generateFJO(mission, history, user.email);
+  };
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -135,6 +144,14 @@ const DailyReportModal = ({ mission, onClose, onSaved }) => {
             </h3>
             <p className="text-xs text-gray-300 opacity-80">{mission.title}</p>
           </div>
+          {/* BOTÓN PDF NUEVO */}
+          <button
+            onClick={handleDownloadPDF}
+            className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition"
+            title="Descargar Ficha Oficial"
+          >
+            <FileDown className="w-4 h-4" /> Exportar FJO
+          </button>
           <button
             onClick={onClose}
             className="p-1 hover:bg-white/20 rounded-full transition"
