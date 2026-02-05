@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  /* --- Paleta Corporativa ECOAN (Versión Dark/Elegant) --- */
+  
+  /* Azul Profundo: Para la barra lateral y encabezados principales. Seriedad. */
+  --color-ecoan-blue: #14283a; 
+  
+  /* Verde Bosque: Mucho más oscuro, para botones de acción y énfasis. */
+  --color-ecoan-green: #2f5e3d; 
+  
+  /* Marrón Tierra Oscuro: Para bordes sutiles y textos secundarios. */
+  --color-ecoan-brown: #5d4037; 
+  
+  /* Crema Suave: Fondo general para evitar la fatiga visual del blanco puro. */
+  --color-ecoan-cream: #faf9f6;
+  
+  /* Gris Pizarra: Para textos de lectura. */
+  --color-ecoan-slate: #334155;
+}
+
+body {
+  background-color: var(--color-ecoan-cream);
+  color: var(--color-ecoan-slate);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif; /* Si puedes, usa Inter */
+}
