@@ -1,42 +1,42 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { calculateDailyCompensation } from "./compensationLogic";
 
-export const generateFJO = (mission, dailyRecords, userName) => {
+export const generateFJO = (mission, dailyRecords = [], userName) => {
   const doc = new jsPDF();
 
-  // --- ENCABEZADO ---
+  // Encabezado
   doc.setFontSize(16);
-  doc.setTextColor(30, 58, 95); // Azul ECOAN
+  doc.setTextColor(30, 58, 95);
   doc.text("FICHA DE JORNADA OPERATIVA (FJO)", 105, 15, { align: "center" });
-
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text("Anexo II - Política de Compensaciones v1.0", 105, 20, {
     align: "center",
   });
 
-  // --- DATOS GENERALES ---
-  doc.autoTable({
+  // 🔴 TRUCO: Forzamos String() en cada campo para evitar vacíos
+  const colaborador = String(userName || "---");
+  const proyecto = String(mission.title || "---");
+  const destino = String(mission.destination || "---");
+  const fechas = `${mission.start_date} al ${mission.end_date}`;
+
+  // Tabla Datos Generales
+  autoTable(doc, {
     startY: 30,
-    head: [["DATOS DEL COLLABORADOR Y MISIÓN"]],
+    head: [["DATOS DEL COLABORADOR Y MISIÓN"]],
     body: [
-      ["Colaborador:", userName],
-      ["Proyecto/Actividad:", mission.title],
-      ["Lugar/Destino:", mission.destination],
-      ["Fechas:", `${mission.start_date} al ${mission.end_date}`],
+      ["Colaborador:", colaborador],
+      ["Proyecto/Actividad:", proyecto],
+      ["Lugar/Destino:", destino],
+      ["Fechas:", fechas],
     ],
     theme: "grid",
-    headStyles: { fillColor: [47, 94, 61] }, // Verde ECOAN
-    styles: { fontSize: 9, cellPadding: 2 },
+    headStyles: { fillColor: [47, 94, 61] },
+    columnStyles: { 0: { fontStyle: "bold", width: 40 } }, // Negrita a la etiqueta
   });
 
-  // --- TABLA DE REGISTROS ---
-  // Preparamos los datos
-  let totalTel = 0;
-  let totalTcn = 0;
-  let totalDaysOff = 0;
-
+  // Tabla Registros
   const tableRows = dailyRecords.map((rec) => {
     const calc = calculateDailyCompensation(
       rec.tel_hours,
@@ -44,12 +44,6 @@ export const generateFJO = (mission, dailyRecords, userName) => {
       rec.has_pernocte,
       rec.is_weekend_holiday,
     );
-
-    // Acumuladores
-    totalTel += calc.telCompensable;
-    totalTcn += calc.tcnCompensable;
-    if (calc.generatesFullDay) totalDaysOff += 1;
-
     return [
       rec.date,
       rec.is_weekend_holiday ? "Sí" : "No",
@@ -60,53 +54,49 @@ export const generateFJO = (mission, dailyRecords, userName) => {
     ];
   });
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: doc.lastAutoTable.finalY + 10,
-    head: [
-      [
-        "Fecha",
-        "Finde?",
-        "TEL (Real)",
-        "Viaje (Real)",
-        "Pernocte",
-        "Compensación Ganada",
-      ],
-    ],
-    body: tableRows,
+    head: [["Fecha", "Finde?", "TEL", "Viaje", "Pernocte", "Ganado"]],
+    body: tableRows.length ? tableRows : [["-", "-", "-", "-", "-", "-"]],
     theme: "striped",
-    headStyles: { fillColor: [30, 58, 95] }, // Azul ECOAN
-    styles: { fontSize: 8, halign: "center" },
-    columnStyles: { 5: { fontStyle: "bold", textColor: [47, 94, 61] } },
+    headStyles: { fillColor: [30, 58, 95] },
+    styles: { halign: "center" },
   });
 
-  // --- RESUMEN FINAL ---
-  doc.autoTable({
+  // Resumen
+  let totalBolsa = 0;
+  let totalDias = 0;
+  dailyRecords.forEach((rec) => {
+    const calc = calculateDailyCompensation(
+      rec.tel_hours,
+      rec.travel_hours,
+      rec.has_pernocte,
+      rec.is_weekend_holiday,
+    );
+    if (calc.generatesFullDay) totalDias++;
+    else totalBolsa += calc.totalHours;
+  });
+
+  autoTable(doc, {
     startY: doc.lastAutoTable.finalY + 10,
     head: [["RESUMEN DE COMPENSACIÓN", "CANTIDAD"]],
     body: [
-      [
-        "Total Horas Compensables (Bolsa)",
-        `${(totalTel + totalTcn).toFixed(1)} horas`,
-      ],
-      ["Total Días Libres (Fines de Semana)", `${totalDaysOff} días`],
+      ["Total Horas Compensables (Bolsa)", `${totalBolsa.toFixed(1)} horas`],
+      ["Total Días Libres", `${totalDias} días`],
     ],
     theme: "grid",
-    headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
-    columnStyles: { 1: { fontStyle: "bold" } },
+    headStyles: { fillColor: [220, 220, 220], textColor: 20 },
+    columnStyles: { 1: { fontStyle: "bold", halign: "right" } },
     tableWidth: 100,
-    margin: { left: 105 }, // Alinear a la derecha
+    margin: { left: 105 },
   });
 
-  // --- FIRMAS ---
+  // Firmas
   const pageHeight = doc.internal.pageSize.height;
-  doc.line(20, pageHeight - 40, 80, pageHeight - 40); // Línea firma 1
-  doc.text("Firma del Colaborador", 50, pageHeight - 35, { align: "center" });
+  doc.line(20, pageHeight - 30, 80, pageHeight - 30);
+  doc.text("Firma Colaborador", 50, pageHeight - 25, { align: "center" });
+  doc.line(130, pageHeight - 30, 190, pageHeight - 30);
+  doc.text("Visto Bueno Jefe", 160, pageHeight - 25, { align: "center" });
 
-  doc.line(130, pageHeight - 40, 190, pageHeight - 40); // Línea firma 2
-  doc.text("Visto Bueno (Jefe Inmediato)", 160, pageHeight - 35, {
-    align: "center",
-  });
-
-  // Guardar archivo
-  doc.save(`FJO_${mission.title}_${mission.start_date}.pdf`);
+  doc.save(`FJO_Reporte.pdf`);
 };

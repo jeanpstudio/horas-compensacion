@@ -13,8 +13,8 @@ import {
   AlertCircle,
   FileDown,
 } from "lucide-react";
-import { generateFJO } from "../../utils/pdfGenerator"; // <--- Importamos el generador
-
+// Verifica que esta línea exista arriba
+import { generateFJO } from "../../utils/pdfGenerator";
 // AHORA RECIBIMOS LA PROP "onSaved"
 const DailyReportModal = ({ mission, onClose, onSaved }) => {
   const [loading, setLoading] = useState(false);
@@ -127,12 +127,39 @@ const DailyReportModal = ({ mission, onClose, onSaved }) => {
     });
   };
   const handleDownloadPDF = async () => {
-    // Necesitamos el nombre del usuario para el PDF
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    // Opcional: Podrías buscar el nombre real en 'profiles', aquí usaremos el email por rapidez
-    generateFJO(mission, history, user.email);
+    try {
+      // 1. Obtener datos del usuario
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      let nombreUsuario = user?.email || "Usuario ECOAN";
+
+      // Intentar sacar nombre real (opcional)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user?.id)
+        .maybeSingle();
+
+      if (profile?.full_name) nombreUsuario = profile.full_name;
+
+      // 2. LIMPIEZA DE DATOS (El truco clave)
+      // Creamos un objeto nuevo con SOLO texto para que el PDF no se confunda
+      const datosLimpiosMision = {
+        title: mission.title || "Sin Título",
+        destination: mission.destination || "Sin Destino",
+        start_date: mission.start_date || "--/--/----",
+        end_date: mission.end_date || "--/--/----",
+      };
+
+      console.log("Enviando al PDF:", datosLimpiosMision); // Mira la consola F12 si falla
+
+      // 3. Generar
+      generateFJO(datosLimpiosMision, history, nombreUsuario);
+    } catch (error) {
+      console.error("Error PDF:", error);
+      alert("Error al generar PDF. Revisa la consola.");
+    }
   };
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
