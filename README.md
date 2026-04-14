@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# 🕒 FieldOps | Compensatory Time & Resource Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A specialized internal tool engineered to automate the tracking and approval of compensatory time for field-based teams. This application solves the complex logic of calculating time-off credits based on diverse high-altitude activities and remote work durations.
 
-Currently, two official plugins are available:
+## 🚀 Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Automated Credit Engine**: Custom logic that calculates compensatory hours based on specific field activities and overtime variables.
+- **Hierarchical Approval Workflow**: Multi-level user roles (Field Staff / Managers) for secure hour verification and authorization.
+- **Activity Logging**: Detailed tracking of remote operations, ensuring full transparency for HR and operational audits.
+- **User Management & Auth**: Role-based access control (RBAC) to ensure data integrity and security across the organization.
 
-## React Compiler
+## 🛠 Technical Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: [React 18+](https://react.dev/) with Functional Components.
+- **Type Safety**: [TypeScript](https://www.typescriptlang.org/) for managing complex activity-credit data structures.
+- **Build Tool**: [Vite](https://vitejs.dev/) for high-performance bundling.
+- **Standards**: Strict ESLint configuration with type-aware linting for production-grade stability.
 
-## Expanding the ESLint configuration
+## 🏗 Engineering Excellence
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Business Logic Integration**: The core engine translates administrative labor policies into functional code, automating what was previously a manual spreadsheet process.
+- **Scalable Architecture**: Built with Vite and TypeScript to ensure low latency and maintainable code for growing teams.
+- **UI/UX for Field Teams**: Simplified data entry modules designed for high-stress field environments where efficiency is critical.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚙️ Installation & Development
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/your-username/fieldops-tracker.git](https://github.com/your-username/fieldops-tracker.git)
+Install dependencies:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Bash
+npm install
+Run the development server:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Bash
+npm run dev
+📄 Organizational Impact
+This project was conceptualized to bridge the operational gap between field expeditions and administrative compliance. It demonstrates my ability to engineer internal tools that reduce bureaucratic overhead and improve team welfare in international programs.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Developed by Jean Pierre Salguero
