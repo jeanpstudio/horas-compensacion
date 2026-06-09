@@ -1,4 +1,4 @@
-export default  Mission {
+export interface Mission {
   id: string;
   title: string;
   destination: string;
@@ -7,7 +7,7 @@ export default  Mission {
   status: 'draft' | 'pending' | 'approved_boss' | 'approved_hr';
 }
 
-export default DailyRecord {
+export interface DailyRecord {
   id: string;
   mission_id: string;
   date: string;
